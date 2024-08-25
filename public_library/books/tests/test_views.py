@@ -83,3 +83,15 @@ def test_create_book_with_blank_fields(field, db):
     response = client.post('/books/', data)
     assert response.status_code == 400
     assert not Book.objects.count()
+
+
+def test_delete_book(book_1, db):
+    response = client.delete('/books/123456/')
+    assert response.status_code == 204
+    assert not Book.objects.filter(id='123456').exists()
+
+
+def test_delete_non_existing_book(db):
+    response = client.delete('/books/123456/')
+    assert response.status_code == 404
+    assert not Book.objects.filter(id='123456').exists()
