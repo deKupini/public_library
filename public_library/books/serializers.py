@@ -19,16 +19,3 @@ class CreateBookSerializer(serializers.ModelSerializer):
         if not value.isdigit():
             raise serializers.ValidationError('ID must be a number')
         return value
-
-
-class PartialUpdateBookSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Book
-        fields = ('borrower',)
-
-    def validate_borrower(self, value):
-        if len(value) != 6:
-            raise serializers.ValidationError('ID must be 6 characters long')
-        if not value.isdigit():
-            raise serializers.ValidationError('ID must be a number')
-        return value

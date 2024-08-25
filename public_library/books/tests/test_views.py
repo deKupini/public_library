@@ -101,7 +101,7 @@ def test_delete_non_existing_book(db):
 @freeze_time("2022-01-01")
 def test_borrow_book(book_2, db):
     client.patch('/books/789012/borrow/', {'borrower': '123456'})
-    book = Book.objects.get(id='789012')
+    book = Book.objects.get(id=book_2.id)
     assert book.borrowed
     assert book.borrow_date.strftime('%Y-%m-%d') == '2022-01-01'
     assert book.borrower == '123456'
@@ -115,7 +115,29 @@ def test_borrow_non_existing_book(db):
 def test_borrow_already_borrowed_book(book_1, db):
     response = client.patch('/books/123456/borrow/', {'borrower': '123456'})
     assert response.status_code == 400
-    book = Book.objects.get(id='123456')
+    book = Book.objects.get(id=book_1.id)
     assert book.borrowed
     assert book.borrow_date.strftime('%Y-%m-%d') == book_1.borrow_date
     assert book.borrower == book_1.borrower
+
+
+def test_return_book(book_1, db):
+    client.patch('/books/123456/return_/', {})
+    book = Book.objects.get(id=book_1.id)
+    assert not book.borrowed
+    assert book.borrow_date is None
+    assert book.borrower is None
+
+
+def test_return_non_existing_book(db):
+    response = client.patch('/books/123456/return_/', {})
+    assert response.status_code == 404
+
+
+def test_return_already_returned_book(book_2, db):
+    response = client.patch('/books/789012/return_/', {})
+    assert response.status_code == 400
+    book = Book.objects.get(id=book_2.id)
+    assert not book.borrowed
+    assert book.borrow_date is None
+    assert book.borrower is None
