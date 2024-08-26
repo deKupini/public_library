@@ -10,11 +10,18 @@ from .serializers import BookSerializer, CreateBookSerializer
 
 class BookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_serializer_class(self):
         if self.action == 'create':
             return CreateBookSerializer
         return BookSerializer
+
+    def partial_update(self, request, *args, **kwargs):
+        return Response(status=404)
+
+    def retrieve(self, request, *args, **kwargs):
+        return Response(status=404)
 
     @action(detail=True, methods=['patch'])
     def borrow(self, request, pk):
